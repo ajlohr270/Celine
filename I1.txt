@@ -1,0 +1,5 @@
+read `RecSum.txt`;
+rec := simplify(RecSum(3,3,10,1,1+N-N^2,binomial(n,k),n,k,N)/N^n):
+lprint(0 = (add(coeff(rec,N,i)*N^i,i=0..degree(rec,N)))*x_n);
+
+quit;

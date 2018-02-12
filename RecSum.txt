@@ -1,0 +1,166 @@
+with(combinat):
+Help:=proc()
+if (args=NULL) then
+print(`Functions included are:`):
+print(`RecSum(maxI,maxJ,timeout,d,eqT,F,n,k,N,T,a)`):
+print(`ReduceT(T,eqT,N,shift,base,n)`):
+print(`RecToSeq(Rec,Ini,numterms,N,n)`):
+print(`SumToSeq(numTerms,d,Tini,eqT,F,n,k,N)`):
+
+elif(args = RecSum) then
+print(`maxI and maxJ are upperbounds on the offsets of n and k respectively`):
+print(`increasing maxI will allow looking for higher order recurrences`):
+print(`increasing maxJ will take more time looking for the lower order recurrences`):
+print(`timeout is the time in seconds that if a case longer than, the procedure will fail`):
+print(`n,k,N,T,a are all left just as symbols to appear in other parts of input/output`):
+print(`Tries to compute a recurrence that is satisfied f which is`):
+print(`the sum over all k of F*g(k)^d`):
+print(`where g is the solution to the recurrence eqT`):
+print(`for formats of eqT, see the help for procedure ReduceT`):
+print(`For Example: RecSum(2,2,10,1,1+N-N^2,binomial(n,k),n,k,N,T,a);`):
+print(`will return N^(n+2)-3*N^(n+1)+N^n`):
+print(`interpret this as N^(n+2) being the n+2 term in the sequence etc`):
+print(`and the whole expression being euqal to zero`):
+print(`in this case it is the recurrence that is satisfied by the sequence`):
+print(`A001906 a_n = \sum_k binomial(n,k)*fibonacci(k)`):
+print(`If this procedure fails it will usually output a useless tautology, try increasing maxI or maxJ`):
+
+elif(args = ReduceT) then
+print(`Format for eqT is that the coefficient i of N is T(k+i), and the whole thing is equal to T(k+degree(eqT,N)+1)`):
+print(`n is the value of k in T(k), it should appear in eqT`):
+print(`The reduced value will contain expressions T[k-i] for i at least 0 and at most the degree (in N) of eqT`):
+print(`For Example: seq(subs({T[1]=1,T[0]=1},(ReduceT(T,((2*n-1)*N+3*(n-1))/n- N^2,N,k,0,n))),k=0..9);`):
+print(`gives the first 10 central trinomial coefficients`):
+
+elif (args= RecToSeq) then
+print(`Rec is the recurrence output from RecSum`):
+print(`Ini is the initial segment to start the recurrence off`):
+print(`N and n are left as symbols`):
+print(`for example RecToSeq(N^3-N^2-N-1,[0,0,1],10,N,n)`):
+print(`will give you the first 10 tribonacci numbers`):
+
+elif (args=SumToSeq) then
+print(`numTerms is how many terms of the sequence you'd like to compute`):
+print(`eqT and Tini are a recurrence and initial terms for some sequence t(k)`):
+print(`F is some expression in n and k`):
+print(`n,k,N are all left as symbols`):
+print(`This function outputs a sequence in n, starting at 0 of`):
+print(`sum_{k=0}^{k=n}t(k)^d*F(n,k)`):
+fi:
+end:
+
+RecSum:=proc(maxI,maxJ,timeout,d,eqT,F,n,k,N) local myI,myJ,ret,t:
+for myI from 1 to maxI do
+for myJ from 1 to maxJ do
+#print(`i,j,time is`,myI,myJ,time()):
+t:=time();
+ret:=RecSum1(myI,myJ,F,n,k,N,d,eqT):
+if(ret<>FAIL) then
+RETURN(ret):
+elif (time()-t > timeout) then
+RETURN(FAIL):
+fi:
+od:
+od:
+FAIL:
+end:
+
+RecTrinomial:=proc(n,N) (2*(n)-1)/n*N+3*(n-1)/n - N^2: end:
+RecMotzkin:=proc(n,N) (3*n-3)/(n+2) + (2*n+1)/(n+2)*N - N^2: end:
+RecTribonacci:=proc(N) 1+N+N^2-N^3: end:
+RecFibonacci:=proc(N) 1+N-N^2: end:
+
+#F is an expression in n and k
+RecSum1:=proc(myI,J,F,n,k,N,d,eqT) local T,i,j,eqs,mysum,cNum,sols,comps,comp,myCoeff,CelineRec2,a:
+mysum:=add(add(simplify(expand(subs({n=n+i,k=k+j},F)/F))*a[i][j]*(ReduceT(T,eqT,N,j,k,n))^d,i=0..myI),j=0..J):
+eqs:={}:
+comps:= combinat[composition](d+degree(eqT,N)+1,degree(eqT,N)+1):
+for comp in comps do
+  myCoeff:=mysum:
+  for i from 1 to nops(comp) do
+    myCoeff:=coeff(myCoeff,T[k-i+1],comp[i]-1):
+  od:
+  cNum:= numer(simplify(myCoeff)):
+  eqs:=eqs union {seq(coeff(cNum,k,i),i=0..degree(cNum,k))}:
+od:
+#print(eqs):
+if(QuickCheckSystem(eqs,{seq(seq(a[i][j],i=0..myI),j=0..J)},3,{n}) = false) then
+#print(`caughtquick`):
+RETURN(FAIL):
+fi:
+sols:=solve(eqs,{seq(seq(a[i][j],i=0..myI),j=0..J)}):
+CelineRec2:=simplify(add(add(N^(n+i)*subs(sols,a[i][j]),i=0..myI),j=0..J)):
+myCoeff:=N^(n+myI) - simplify(solve(CelineRec2,N^(n+myI)));
+#myCoeff:=CelineRec2:
+myCoeff:=simplify(myCoeff*denom(simplify(solve(CelineRec2,N^(n+myI))))):
+if(myCoeff=0) then
+  FAIL:
+else
+  myCoeff:
+fi:
+end:
+
+#N is shift operator
+#eqT is given in format that the expression is equal to zero.
+ReduceT:=proc(T,eqT,N,shift,base,n) local i,myEqT,deg:
+if(shift<=0) then
+  RETURN(T[shift+base]):
+fi:
+deg:= degree(eqT,N):
+myEqT:= eqT - coeff(eqT,N,deg)*N^deg:
+normal(add(subs(n=base+shift,coeff(myEqT,N,i))*ReduceT(T,eqT,N,shift - deg+i,base,n),i=0..deg-1)/(-subs(n=base+shift,coeff(eqT,N,deg)))):
+end:
+
+#maple won't evaluate degree without this for some reason
+foodeg:=proc(expr,x)
+degree(expr,x):
+end:
+
+RecToSeq:=proc(Rec,Ini,numterms,N,n) local d,i,j,ret,myRec,myexpr,ld:
+myRec:=simplify(Rec/N^n):
+if(not type(myRec,polynom)) then
+  myRec :=simplify(Rec):
+fi:
+ld:=ldegree(myRec,N):
+i:=1+ld:
+myRec:=simplify(myRec/N^(ldegree(myRec,N))):
+d:=foodeg(myRec,N):
+if(nops(Ini)<d) then
+  print(`give longer Initial conditions for t sequence`):
+  RETURN(FAIL):
+fi:
+ret:=Ini:
+while(nops(ret)<numterms) do
+  myexpr:=subs(n=i-ld,myRec):
+  myexpr:=solve(myexpr,N^d):
+  myexpr:=expand(myexpr,N):
+  myexpr:=add(coeff(myexpr,N,j)*ret[i+j],j=0..d-1):
+  ret:=[op(ret),myexpr]:
+  i:=i+1:
+od:
+RETURN(ret):
+end:
+
+#plugs in NumCheck many different values into the plugvars and then sees if there is a solution to the
+# resulting system. This takes advantage of the fact that it is often faster to solve
+# a system numerically than symbolically. And if it is not feasable for some particular values
+# then there is no hope of finding a symbolic solution.
+QuickCheckSystem:=proc(eqs,vars,NumCheck,plugvars) local i,j,myEqs,sol:
+for i from 1 to NumCheck do
+myEqs:=subs({seq(plugvars[j] = 1/(i*nops(plugvars)+j),j=1..nops(plugvars))},eqs):
+sol:=solve(myEqs,vars):
+if(subs(sol,vars)={0}) then
+RETURN(false):
+fi:
+od:
+RETURN(true):
+end:
+
+SumToSeq:=proc(numTerms,d,Tini,eqT,F,n,k,N) local i,j,ii,T:
+seq(
+add(
+subs({seq(T[-i] = Tini[nops(Tini)-i],i=0..nops(Tini)-1)},
+subs(n=ii,ReduceT(T,eqT,N,j,0,n)))^d*subs({k=j,n=ii},F)
+,j=0..ii),ii=0..numTerms):
+end:
+
