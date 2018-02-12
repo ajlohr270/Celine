@@ -1,0 +1,101 @@
+
+
+ <html>
+<head>
+<title>
+Summations of Linear Recurrent Sequences
+</title>
+</head>
+
+
+<body>
+<Font Size=+3>
+<B>
+<Font Color=Red>
+<Font size=+5>
+<center>
+Summations of Linear Recurrent Sequences
+</center>
+<P>
+</font>
+</font>
+<font size=+3>
+By Andrew Lohr
+<hr>
+<Font size=+5>
+<A HREF
+="http://www.math.rutgers.edu/~ajl213/DrZ/Celine.pdf">
+.pdf</A> &nbsp;
+<A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine.tex">.tex</A> &nbsp;
+<A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/Recurrences.txt">Appendix</A> &nbsp;
+
+</font>
+<hr>
+First written:  August 28, 2017.
+<P>
+This version: October 30, 2017.
+<br>
+
+
+<hr>
+This is an extension of Sister Celine's beuatiful approach to automatic identity proving. Normally, you would only be able to identify summations of hypergeometric terms. This approach allows you to have to product of a hypergeometric expression, and an expression that follows a Q-recurrence. The factor satisfies a Q-recurrence if each term depends on only some finite number of previous terms, each weighted by some rational function of n, the index of the term you are computing. This is a significant enlarging of the scope of what can be handled.
+<P>
+
+
+
+
+<hr>
+<h1>Maple Package</h1>
+This paper is provided with an accompaning  Maple package <A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/RecSum.txt">RecSum</A>. Whose main feature is it's function to attempt to evaluate sums of linear recurrent sequences. I encourage you to try it out to prove your identities. Since so many problems can be phrased as summations that have a linear recurrent part (think fibonacci, central n-nomial coefficient, motzkin,...) and a hypergeometric part(binomial coeffieients, factorial,...), this approach should have widespread use. The paper accompanying the package only begins to scratch the surface of its uses. As mentioned in the paper there are many tools for analyzing the output of this package, in particular, to compute asymptotics from what this program outputs, you can use the wonderful package <A HREF= "http://sites.math.rutgers.edu/~zeilberg/mamarim/mamarimhtml/asy.html" >AsyRec</A>. There is a detailed Help function written into the package which you can access by typing Help(RecSum) after reading the package. There are some convenience functions written in that allow you to crank out a ton of terms given the recurrence that RecSum outputs.
+
+<hr>
+<h1>Sample Input and Output for RecSum</h1>
+<UL>
+<LI>
+<P>
+If you wanted to evaluate the binomial tranform of the fibonacci sequence, calling the resulting sequence {x_n}
+<A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/I1.txt">input</A>
+gives the <A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/O1.txt">output</A>.
+
+<LI>
+<P>
+If you wanted to evaluate the binomial tranform of the squares of Motzkin numbers, calling the resulting sequence {x_n}
+<A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/I2.txt">input</A>
+gives the <A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/O2.txt">output</A>.
+
+<LI>
+<P>
+If you wanted to compute the sum of central trinomial numbers times 2n choose k, calling the resulting sequence {x_n}.
+<A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/I3.txt">input</A>
+gives the <A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/O3.txt">output</A>.
+
+
+<LI>
+<P>
+If you had some sequence that you got your hands on that satisfies 0=((3*n^3-4)+(n^2+1)*N - 4*n*N^3)y_n, and you wanted to compute it's binomial transform to get a new sequence {x_n}
+<A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/I4.txt">input</A>
+gives the <A HREF="http://www.math.rutgers.edu/~ajl213/DrZ/Celine/O4.txt">output</A>.
+</UL>
+
+<hr>
+<P>
+<A HREF
+="http://www.math.rutgers.edu/~ajl213">
+Andrew Lohr's Home Page
+</A><P>
+
+</body>
+</html>
+
+
+ 
+
+
+
+
+
+
+
+
+
+
